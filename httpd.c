@@ -484,14 +484,48 @@ int get_line(int sock, char *buf, int size)
 void headers(int client, const char *filename)
 {
  char buf[1024];
+ const char *pFileExt = NULL;
  (void)filename;  /* could use filename to determine file type */
 
  strcpy(buf, "HTTP/1.0 200 OK\r\n");
  send(client, buf, strlen(buf), 0);
+
  strcpy(buf, SERVER_STRING);
  send(client, buf, strlen(buf), 0);
- sprintf(buf, "Content-Type: text/html\r\n");
- send(client, buf, strlen(buf), 0);
+
+ 
+
+  // 判断输入的文件名最后输出.的位置
+  pFileExt = strrchr(filename, '.'); 
+
+  if (pFileExt  != NULL)
+    { 
+        if ( strcmp(pFileExt,  ".css")  == 0 )
+        { 
+           sprintf(buf, "Content-Type: text/css\r\n");
+         
+        }
+        else if ( strcmp(pFileExt,  ".js") == 0 )
+        { 
+            
+             sprintf(buf, "Content-Type: application/javascript\r\n");
+           
+        }
+        else
+        {
+          sprintf(buf, "Content-Type: text/html\r\n");
+        }
+    }
+    else
+    {
+       /*default*/
+       sprintf(buf, "Content-Type: text/html\r\n");
+    }
+
+     send(client, buf, strlen(buf), 0);
+
+
+
  strcpy(buf, "\r\n");
  send(client, buf, strlen(buf), 0);
 }
@@ -627,7 +661,7 @@ void unimplemented(int client)
 int main(void)
 {
  int server_sock = -1;
- u_short port = 0;
+ u_short port = 5166;/*use fixed port for  test*/
  int client_sock = -1;
  struct sockaddr_in client_name;
 
